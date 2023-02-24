@@ -39,4 +39,3 @@ final class SelectableTableViewDataSource {
         return tableViewDataSource
     }
 }
-

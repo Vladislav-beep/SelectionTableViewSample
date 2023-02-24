@@ -22,7 +22,6 @@ final class SelectableCell: UITableViewCell {
     private let leftIconView: UIImageView = {
         let leftIconView = UIImageView()
         leftIconView.clipsToBounds = true
-        leftIconView.image = UIImage(named: "document")
         leftIconView.translatesAutoresizingMaskIntoConstraints = false
         return leftIconView
     }()
