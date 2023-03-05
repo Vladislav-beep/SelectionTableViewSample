@@ -11,15 +11,16 @@ class SelectionTableViewController: UIViewController {
     
     // MARK: Private properties
     
-    private let data = [
-        CellsDataModel.selectable(.init(title: "Blackberry", image: "blackberry", isSelected: true)),
-        CellsDataModel.selectable(.init(title: "Blueberry", image: "blueberry", isSelected: true)),
-        CellsDataModel.selectable(.init(title: "Cowberry", image: "cowberry", isSelected: true)),
-        CellsDataModel.selectable(.init(title: "Grape", image: "grapes", isSelected: true)),
-        CellsDataModel.selectable(.init(title: "Strawberry with a very long title", image: "strawberry", isSelected: true))
+    private lazy var data = [
+        CellsDataModel.selectable(.init(title: "Blackberry", image: "blackberry", isSelected: true, isSelectionModeOn: isSelectionModeOn)),
+        CellsDataModel.selectable(.init(title: "Blueberry", image: "blueberry", isSelected: true, isSelectionModeOn: isSelectionModeOn)),
+        CellsDataModel.selectable(.init(title: "Cowberry", image: "cowberry", isSelected: true, isSelectionModeOn: isSelectionModeOn)),
+        CellsDataModel.selectable(.init(title: "Grape", image: "grapes", isSelected: true, isSelectionModeOn: isSelectionModeOn)),
+        CellsDataModel.selectable(.init(title: "Strawberry with a very long title", image: "strawberry", isSelected: true, isSelectionModeOn: isSelectionModeOn))
     ]
     
     private var selectedData = [CellsDataModel]()
+    private var isSelectionModeOn = false
     
     private let listTableView: UITableView = {
         let listTableView = UITableView()
@@ -32,7 +33,7 @@ class SelectionTableViewController: UIViewController {
     private lazy var tableViewDataSource = SelectableTableViewDataSource().makeDataSource(for: listTableView)
     
     // MARK: Lifecycle
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         selectedData = data
@@ -55,6 +56,20 @@ class SelectionTableViewController: UIViewController {
     }
     
     private func updateTableView() {
+        for index in 0...selectedData.count - 1 {
+            switch selectedData[index] {
+            case .selectable(let model):
+                selectedData[index] = CellsDataModel.selectable(.init(
+                    title: model.title,
+                    image: model.image,
+                    isSelected: model.isSelected,
+                    isSelectionModeOn: isSelectionModeOn
+                ))
+                
+            case .empty:
+                break
+            }
+        }
         var snapshot = NSDiffableDataSourceSnapshot<Int, CellsDataModel>()
         snapshot.appendSections([0])
         snapshot.appendItems(selectedData, toSection: 0)
@@ -78,6 +93,19 @@ class SelectionTableViewController: UIViewController {
         }
         title = "Berries: \(counter)"
         navigationController?.navigationBar.prefersLargeTitles = true
+        let buttonTitle: String
+        if isSelectionModeOn {
+            buttonTitle = "Stop"
+        } else {
+            buttonTitle = "Select"
+        }
+        let navButton = UIBarButtonItem(title: buttonTitle, style: .plain, target: self, action:#selector(tapNavButton))
+        navigationItem.rightBarButtonItem = navButton
+    }
+    
+    @objc func tapNavButton() {
+        isSelectionModeOn.toggle()
+        updateTableView()
     }
 }
 
@@ -86,6 +114,7 @@ extension SelectionTableViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         guard let item = tableViewDataSource.itemIdentifier(for: indexPath) else { return }
+        guard isSelectionModeOn else { return }
         
         switch item {
         case .selectable(let model):
@@ -93,9 +122,10 @@ extension SelectionTableViewController: UITableViewDelegate {
             selectedData[indexPath.row] = CellsDataModel.selectable(.init(
                 title: model.title,
                 image: model.image,
-                isSelected: !isSelected
+                isSelected: !isSelected,
+                isSelectionModeOn: isSelectionModeOn
             ))
-
+            
             updateTableView()
             
         case .empty:

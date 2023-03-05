@@ -15,6 +15,7 @@ final class SelectableCell: UITableViewCell {
         let title: String
         let image: String
         let isSelected: Bool
+        let isSelectionModeOn: Bool
     }
     
     // MARK: Private properties
@@ -82,8 +83,14 @@ final class SelectableCell: UITableViewCell {
         ])
     }
     
-    private func configureIcon(isSelected: Bool) {
-        if isSelected {
+    private func configureIcon(displayData: DisplayData) {
+        if displayData.isSelectionModeOn {
+            selectableIcon.isHidden = false
+        } else {
+            selectableIcon.isHidden = true
+        }
+        
+        if displayData.isSelected {
             selectableIcon.image = UIImage(systemName: "checkmark.circle.fill") ?? UIImage()
         } else {
             selectableIcon.image = UIImage(systemName: "circle") ?? UIImage()
@@ -95,6 +102,6 @@ final class SelectableCell: UITableViewCell {
     func configure(with displayData: DisplayData) {
         titleLabel.text = displayData.title
         leftIconView.image = UIImage(named: displayData.image)
-        configureIcon(isSelected: displayData.isSelected)
+        configureIcon(displayData: displayData)
     }
 }

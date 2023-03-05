@@ -19,7 +19,8 @@ final class SelectableTableViewDataSource {
                 let displayData = SelectableCell.DisplayData(
                     title: model.title,
                     image: model.image,
-                    isSelected: model.isSelected
+                    isSelected: model.isSelected,
+                    isSelectionModeOn: model.isSelectionModeOn
                 )
                 cell.configure(with: displayData)
                 return cell

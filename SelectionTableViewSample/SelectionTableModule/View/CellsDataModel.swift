@@ -14,6 +14,7 @@ struct SelectableCellDataModel: Hashable {
     let title: String
     let image: String
     let isSelected: Bool
+    let isSelectionModeOn: Bool
 }
 
 struct EmptyCellDataModel: Hashable {
